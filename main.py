@@ -204,7 +204,7 @@ class MouserOrderClient:
         body = f"{{'CartKey': {cart_uuid}, 'CartItems': {parts_json}}}"  
         return self.process_request('cart', 'insertitem', body=body)
 
-def main():
+def start_bom_processing():
     success = False
     count = 0
 
@@ -219,7 +219,55 @@ def main():
             time.sleep(API_TIMEOUT_SLEEP_S)
 
     print(f"tries:{count} - success: {success}")
+
+
+import dearpygui.dearpygui as dpg
+
+# Callback function for button click
+def on_button_click(sender, app_data, user_data):
+    start_bom_processing()
+    
+def callback(sender, app_data):
+    print("ok clicked")
+    dpg.set_value(item="path_input", value=app_data['file_path_name'])
+    
+def cancel_callback(sender, app_data):
+    print("cancel was clicked")
+
+    
+def startup():          
+    dpg.create_context()
+
+    dpg.add_file_dialog(
+        directory_selector=True, show=False, callback=callback, tag="file_dialog_id",
+        cancel_callback=cancel_callback, width=600 ,height=400)
+
+    with dpg.window(tag="Primary Window"):            
+        
+        with dpg.group(horizontal=True):
+            dpg.add_text("Directory ")
+            dpg.add_input_text(auto_select_all=True, ctrl_enter_for_new_line=False, default_value=os.getcwd(), tag="path_input")
+            dpg.add_button(label="select..", callback=lambda: dpg.show_item("file_dialog_id"))
+        
+        with dpg.group(horizontal=True):
+            dpg.add_text("Mouser Part Number Keyword: ")
+            dpg.add_input_text(width=300, default_value="MPN", tag="mouser_part_number_keyword")
+            dpg.add_button(label="start processing BOM", callback=on_button_click)
+        
+        with dpg.group(horizontal=True):
+            dpg.add_text("log:")
+            dpg.add_input_text(multiline=True, height=100, default_value="waiting for user input...", enabled=False)
+        
+
+    dpg.create_viewport(title='KiCAD Mouser Order Tool', width=800, height=400)
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.set_primary_window("Primary Window", True)
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
+    
     
 if __name__ == "__main__":
-    main()
+    startup()
 
