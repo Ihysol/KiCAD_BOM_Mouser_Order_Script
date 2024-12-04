@@ -19,7 +19,6 @@ def main():
         client = MouserOrderClient()
         bom_handler = BOMHandler()
         bom_handler.get_bom_files()
-        print(bom_handler.BOM_files)
         bom_handler.process_bom_file(bom_handler.BOM_files[0])
         success = client.order_parts_from_data_array(bom_handler.data_array)
         count+=1
