@@ -3,8 +3,6 @@ import os
 import dearpygui.dearpygui as dpg
 import gui.config as config
 
-
-
 class Timer:
     # track dpg time since last render
     
@@ -61,7 +59,6 @@ def gui(app_state):
         with dpg.group(horizontal=True):
             dpg.add_text("thats average")
             
-            
     # styleing 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
@@ -75,5 +72,3 @@ def gui(app_state):
     dpg.set_primary_window("Primary Window", True)
     dpg.start_dearpygui()
     dpg.destroy_context()
-    
-    
