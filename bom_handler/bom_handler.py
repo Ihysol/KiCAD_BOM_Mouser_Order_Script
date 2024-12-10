@@ -23,6 +23,8 @@ class BOMHandler:
     def __init__(self, dir_path="", csv_mouser_column_name=config.CSV_MOUSER_COLUMN_NAME):
         self.csv_partnumber_column_name = csv_mouser_column_name    # get user partnumber string from bom ...     
         
+        self.target_headers[Keys.part_part_number] = self.csv_partnumber_column_name
+        
         if (dir_path == ""):
             self.m_dir_path = os.getcwd()
             self.data_array = {header: [] for header in self.target_headers}
@@ -73,10 +75,11 @@ class BOMHandler:
                     break
 
         if header_row_index is not None:
-            df = pd.read_csv(self.BOM_files[0], skiprows=header_row_index) # read csv, starting after target headers
+            df = pd.read_csv(bom_file, skiprows=header_row_index) # read csv, starting after target headers
             for key, header in self.target_headers.items():
                 df[header] = df[header].astype(str).str.strip()     # clear white spaces
                 self.data_array[key].extend(df[header].tolist()) # use extend to not get double lists
+
             
             # note that the CustomerPartNumber given by Reference(s) must be a string and not exceed 22 characters
             for idx, reference in enumerate(self.data_array[Keys.part_reference]):  

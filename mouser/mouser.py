@@ -107,9 +107,8 @@ class MouserOrderClient:
         if request_type == "cart":
             return MouserCartRequest(operation, body).run()
 
-
-    def order_parts_from_data_array(self, data_array):
-        parts_json = [] # json body buffer
+    def json_from_data_array(self, data_array):
+        self.parts_json = [] # json body buffer
 
         headers = [] # get headers form data array
         for header in data_array:
@@ -117,8 +116,11 @@ class MouserOrderClient:
 
         df = pd.DataFrame(data_array)    
         for idx, row in df.iterrows():
-            parts_json.append({'MouserPartNumber': row[headers[0]], 'Quantity': int(row[headers[1]]), 'CustomerPartNumber':row[headers[2]]})
+            self.parts_json.append({'MouserPartNumber': row[headers[0]], 'Quantity': int(row[headers[1]]), 'CustomerPartNumber':row[headers[2]]})
+            
+        return self.parts_json
 
+    def order_parts_from_json(self, json):
         cart_uuid = uuid.uuid4()
-        body = f"{{'CartKey': {cart_uuid}, 'CartItems': {parts_json}}}"  
+        body = f"{{'CartKey': {cart_uuid}, 'CartItems': {json}}}"  
         return self.process_request('cart', 'insertitem', body=body)
